@@ -80,6 +80,7 @@ public class FPGrowth {
         mergeSorter.sort(frequentSet);
     }
     
+    //Sorts the values of each instance in descending order based on frequency
     public void sortInstances() {
         for(int i = 0; i < numInstances; i++) {
             //Creates an ArrayList for each instance and stores it in the dataSet ArrayList
