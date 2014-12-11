@@ -25,7 +25,7 @@ public class Apriori {
     ArffLoader.ArffReader arff;
     Instances data;
     private ArrayList<Entry> initialSet = new ArrayList<>();
-    private ArrayList<ArrayList<Entry>> dataSet = new ArrayList<>();
+    private ArrayList<ItemSet> dataSet = new ArrayList<>();
     
     public Apriori(String filePath, int minCoverage){
         file = filePath;
@@ -76,12 +76,12 @@ public class Apriori {
                 initialSet.remove(i);
             //If the 1-item set meets the min coverage, add to dataset
             else {
-                dataSet.add(new ArrayList<Entry>());
-                dataSet.get(dataSet.size()-1).add(new Entry(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));
+                dataSet.add(new ItemSet());
+                dataSet.get(dataSet.size()-1).add(initialSet.get(i).getValue(), initialSet.get(i).getAttNum());
             }     
-        }       
+        } 
     }
-    
+    /*
     public void recursiveSetBuild() {
         for(int row = 0; row < dataSet.size(); row++) {
             for(int col = 0; col < dataSet.get(row).size(); col++) {
@@ -93,5 +93,5 @@ public class Apriori {
                 }
             }
         }
-    }
+    }*/
 }
