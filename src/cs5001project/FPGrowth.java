@@ -56,14 +56,16 @@ public class FPGrowth {
         //Loops through the dataset and creates an array containing every value and counts how often that value appears
         for(int i = 0; i < numInstances; i++) {
             for(int j = 0; j < numAttributes; j++) {
-                //If that instance value is not already in the array, then add it
-                if(!frequentSet.contains(new Entry(data.instance(i).stringValue(j), j))) {
-                    frequentSet.add(new Entry(data.instance(i).stringValue(j), j));
-                }
-                //else increment the count of that instance value in the array
-                else {
-                    int index = frequentSet.indexOf(new Entry(data.instance(i).stringValue(j), j));
-                    frequentSet.get(index).countIncrement();
+                for(int k = 0; k < frequentSet.size(); k++) {
+                    //if the frequentSet contains the current value, then stop looking and increment count
+                    if((frequentSet.get(k).getValue()).equals(data.instance(i).stringValue(j)) && (frequentSet.get(k).getAttNum() != j) ) {
+                        int index = frequentSet.indexOf(new Entry(data.instance(i).stringValue(j), j));
+                        frequentSet.get(index).countIncrement();
+                        break;
+                    }
+                    //If it searched through the entire set and did not find the value, then add it
+                    else if(k == frequentSet.size()-1)
+                        frequentSet.add(new Entry(data.instance(i).stringValue(j), j));
                 }
             }
         }
