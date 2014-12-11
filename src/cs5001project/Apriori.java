@@ -79,23 +79,13 @@ public class Apriori {
                 dataSet.add(new ArrayList<Entry>());
                 dataSet.get(dataSet.size()-1).add(new Entry(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));
             }     
-        }
-        
-        for(int i = 0; i <initialSet.size(); i++) {
-            System.out.println(initialSet.get(i).getAttNum()+", "+initialSet.get(i).getValue()+", "+initialSet.get(i).getCount());
-        }
-        System.out.println();
-        for(int i = 0; i < dataSet.size(); i++) {
-            for(int j = 0; j < dataSet.get(i).size(); j++)
-                System.out.println(dataSet.get(i).get(j).getAttNum()+", "+initialSet.get(i).getValue()+", "+initialSet.get(i).getCount());
-        }
-            
+        }       
     }
-    /*
+    
     public void recursiveSetBuild() {
         for(int row = 0; row < dataSet.size(); row++) {
-            for(int j = 0; j < initialSet.size(); j++) {
-                for(int col = 0; col < dataSet.get(row).size(); col++) {
+            for(int col = 0; col < dataSet.get(row).size(); col++) {
+                for(int j = 0; j < initialSet.size(); j++) {
                     if(dataSet.get(row).get(col).getAttNum() == initialSet.get(j).getAttNum()); {
                         if(dataSet.get(row).get(col).getValue().equals(initialSet.get(j).getValue()))
                             
@@ -103,5 +93,5 @@ public class Apriori {
                 }
             }
         }
-    }*/
+    }
 }
