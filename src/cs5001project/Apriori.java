@@ -49,35 +49,27 @@ public class Apriori {
         System.out.println((data.toString()));
     }
     
-    public void apriori(){
-        for(int setSize = 0; setSize < numAttributes; setSize++) { 
-            for(int instance = 0; instance < numInstances; instance++) {
-		for(int value = 0; value < setSize; value++) {
-			//arrList.add((data.instance(instance)).toString(value));
-		}
-
-            }
-        }
-    }
     
     public void createInitialSet() {
+        //Add value so initialSet isn't empty
+        initialSet.add(new Entry(data.instance(0).stringValue(0), 0));
+        
         //Loops through the dataset and creates an array containing every value and counts how often that value appears
-        for(int i = 0; i < numInstances; i++) {
-            for(int j = 0; j < numAttributes; j++) {
+        for(int row = 0; row < numInstances; row++) {
+            for(int col = 0; col < numAttributes; col++) {
                 for(int k = 0; k < initialSet.size(); k++) {
-                    //if the frequentSet contains the current value, then stop looking and increment count
-                    if((initialSet.get(k).getValue()).equals(data.instance(i).stringValue(j)) && (initialSet.get(k).getAttNum() != j) ) {
-                        int index = initialSet.indexOf(new Entry(data.instance(i).stringValue(j), j));
-                        initialSet.get(index).countIncrement();
+                    //if the initialSet contains the current value, then stop looking and increment count
+                    if((initialSet.get(k).getValue()).equals(data.instance(row).stringValue(col)) && (initialSet.get(k).getAttNum() == col) ) {
+                        initialSet.get(k).countIncrement();
                         break;
                     }
                     //If it searched through the entire set and did not find the value, then add it
                     else if(k == initialSet.size()-1)
-                        initialSet.add(new Entry(data.instance(i).stringValue(j), j));
+                        initialSet.add(new Entry(data.instance(row).stringValue(col), col));
                 }
             }
         }
-        
+
         //removes all entries that don't meet the minimum coverage
         for(int i = initialSet.size()-1; i >= 0; i--) {
             if(initialSet.get(i).getCount() < minCount)
@@ -88,5 +80,28 @@ public class Apriori {
                 dataSet.get(dataSet.size()-1).add(new Entry(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));
             }     
         }
+        
+        for(int i = 0; i <initialSet.size(); i++) {
+            System.out.println(initialSet.get(i).getAttNum()+", "+initialSet.get(i).getValue()+", "+initialSet.get(i).getCount());
+        }
+        System.out.println();
+        for(int i = 0; i < dataSet.size(); i++) {
+            for(int j = 0; j < dataSet.get(i).size(); j++)
+                System.out.println(dataSet.get(i).get(j).getAttNum()+", "+initialSet.get(i).getValue()+", "+initialSet.get(i).getCount());
+        }
+            
     }
+    /*
+    public void recursiveSetBuild() {
+        for(int row = 0; row < dataSet.size(); row++) {
+            for(int j = 0; j < initialSet.size(); j++) {
+                for(int col = 0; col < dataSet.get(row).size(); col++) {
+                    if(dataSet.get(row).get(col).getAttNum() == initialSet.get(j).getAttNum()); {
+                        if(dataSet.get(row).get(col).getValue().equals(initialSet.get(j).getValue()))
+                            
+                    }
+                }
+            }
+        }
+    }*/
 }

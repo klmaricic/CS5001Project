@@ -13,13 +13,17 @@ public class Entry {
     String value;
     
     public Entry(String val, int attNum) {
-        count = 1;
+        count = 0;
         value = val;
         attributeNum = attNum;
     }
     
     public void countIncrement() {
         count++;
+    }
+    
+    public void countDec() {
+        count--;
     }
     
     public int getCount() {

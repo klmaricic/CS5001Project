@@ -70,4 +70,5 @@ public class Tree {
         public String getValue() {
             return value;
         }
+    }
 }

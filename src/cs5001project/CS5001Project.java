@@ -29,25 +29,35 @@ public class CS5001Project {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        String file, numRulesStr, filePath;
+        String file, numRulesStr, filePath, tempFile;
         int minCoverage, maxSize, numRules;
         double minAccuracy;
         Scanner scanner = new Scanner(System.in);
         BufferedReader reader;
         ArffReader arff;
         Instances data;
+	File folder = new File(".");
+	File[] filesArr = folder.listFiles();
         
-        
-        System.out.println("Hello! What is the name of the file that you wish to use (Do not include the extension): ");
+        System.out.println("Hello! Which of the following files would you like to use? (Do not include the extension): ");
+		
+		for (int i = 0; i < filesArr.length; i++) {
+			if (filesArr[i].isFile()) {
+				tempFile = filesArr[i].getName();
+				
+				if (tempFile.endsWith(".arff"))
+					System.out.println(tempFile);
+			}
+		}
         file = scanner.next();
-        filePath = "C:\\Users\\Kelsey\\Documents\\NetBeansProjects\\CS5001Project\\src\\cs5001project\\"+file+".arff";
+        filePath = System.getProperty("user.dir")+"/"+file+".arff";
         
         //Will continue to ask user for a file name until a valid one is given
         while(!(new File(filePath).isFile())){
             System.out.println("That file does not exist. Please try again.");
             System.out.println("What is the name of the file that you wish to use: ");
             file = scanner.next();
-            filePath = "S:\\CS5001\\Arff Files\\"+file+".arff";
+            filePath = System.getProperty("user.dir")+"/"+file+".arff";
         }
         
         //reader = new BufferedReader(new FileReader(filePath));
@@ -72,6 +82,10 @@ public class CS5001Project {
         }
         minCoverage = scanner.nextInt();
         
+        Apriori apriori = new Apriori(filePath, minCoverage);
+        apriori.createInitialSet();
+        
+        /*
         System.out.println("\nMaximum size of item sets to consider: ");
         while(!scanner.hasNextInt()){
             System.out.println("Invalid input. Please enter an int-type number.\n");
@@ -116,5 +130,6 @@ public class CS5001Project {
     
         return true;
     }
-    
+    */
+    }
 }
