@@ -66,7 +66,7 @@ public class Apriori {
             for(int j = 0; j < numAttributes; j++) {
                 for(int k = 0; k < initialSet.size(); k++) {
                     //if the frequentSet contains the current value, then stop looking and increment count
-                    if((initialSet.get(k).getValue()).equals(data.instance(i).stringValue(j)) && (frequentSet.get(k).getAttNum() != j) ) {
+                    if((initialSet.get(k).getValue()).equals(data.instance(i).stringValue(j)) && (initialSet.get(k).getAttNum() != j) ) {
                         int index = initialSet.indexOf(new Entry(data.instance(i).stringValue(j), j));
                         initialSet.get(index).countIncrement();
                         break;
@@ -80,9 +80,13 @@ public class Apriori {
         
         //removes all entries that don't meet the minimum coverage
         for(int i = initialSet.size()-1; i >= 0; i--) {
-            if(initialSet.get(i).getCount() < minCount) {
+            if(initialSet.get(i).getCount() < minCount)
                 initialSet.remove(i);
-            }
+            //If the 1-item set meets the min coverage, add to dataset
+            else {
+                dataSet.add(new ArrayList<Entry>());
+                dataSet.get(dataSet.size()-1).add(new Entry(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));
+            }     
         }
     }
 }
