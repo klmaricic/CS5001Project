@@ -52,4 +52,13 @@ public class ItemSet {
     public int size() {
         return instance.size();
     }
+    
+    public boolean containsAtt(int attNum) {
+        for(int i = 0; i < instance.size(); i++) {
+            if(instance.get(i).getAttNum() == attNum)
+                return true;
+        }
+        
+        return false;
+    }
 }

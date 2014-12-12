@@ -85,23 +85,27 @@ public class Apriori {
         else 
             recursiveSetBuild(dataSet.size());
         
-        System.out.println("here");
         for(int i = 0; i <dataSet.size(); i++) {
+            System.out.println();
             for(int j = 0; j < dataSet.get(i).size(); j++)
-                System.out.println(dataSet.get(i).get(j).value);
+                System.out.print(dataSet.get(i).get(j).value+", ");
         }
     }
     
     public void recursiveSetBuild(int startIndex) {
         int start = startIndex;
-        System.out.println("here2");
-        if(dataSet.get(dataSet.size()-1).size() >= numAttributes)
+        int size = dataSet.size();
+        if(dataSet.get(dataSet.size()-1).size() >= numAttributes) {
+            System.out.println("return");
             return;
-            
-        for(int row = 0; row < dataSet.size(); row++) {
+        }
+        
+        for(int row = 0; row < size; row++) {
             for(int j = 0; j < initialSet.size(); j++) {
-                dataSet.add(new ItemSet(dataSet.get(row)));
-                dataSet.get(dataSet.size()-1).add(initialSet.get(j).getValue(), initialSet.get(j).getAttNum());
+                if(!dataSet.get(row).containsAtt(initialSet.get(j).getAttNum())) {
+                    dataSet.add(new ItemSet(dataSet.get(row)));
+                    dataSet.get(dataSet.size()-1).add(initialSet.get(j).getValue(), initialSet.get(j).getAttNum());
+                }
             }
         }
         
