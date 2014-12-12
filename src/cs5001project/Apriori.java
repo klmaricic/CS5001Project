@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.core.Instances;
@@ -98,8 +99,9 @@ public class Apriori {
             for(int j = 0; j < dataSet.get(i).size(); j++)
                 System.out.print(dataSet.get(i).get(j).getValue()+", ");
         }
-        
-        permute(dataSet.get(dataSet.size()-1).getArr(), 0);
+        System.out.println("\n----------------------------");
+        dataSet.get(dataSet.size()-1).print();
+        comb(dataSet.get(dataSet.size()-1).getArr());
     }
     
     public void recursiveSetBuild(int startIndex) {
@@ -148,31 +150,25 @@ public class Apriori {
         
         recursiveSetBuild(startSize);
     }
-    public void permute(ArrayList<Entry> arr, int k){
-        for(int i = k; i < arr.size(); i++){
-            java.util.Collections.swap(arr, i, k);
-            permute(arr, k+1);
-            java.util.Collections.swap(arr, k, i);
-        }
-        if (k == arr.size() -1){
-            //System.out.println(java.util.Arrays.toString(arr.toArray()));
-            for(int i = 0; i < arr.size(); i++) {
-                for(int j = 0; j < i; j++)
-                    a.add(arr.get(j));
-                for(int m = i; m < arr.size(); m++)
-                    c.add(arr.get(m));
-                
-                System.out.print("\na: ");
-                for(int m = 0; m < a.size(); m++)
-                    System.out.print(a.get(m).getValue()+", ");
-                
-                System.out.print("\nc: ");
-                for(int n = 0; n < c.size(); n++)
-                    System.out.print(c.get(n).getValue()+", ");
-                
-                a.clear();
-                c.clear();
-            } //LOOK UP COMBINATIONS
-        }
+    public void comb(ArrayList<Entry> e) { 
+        comb(new ArrayList<Entry>(), e); 
     }
+
+    // print all subsets of the remaining elements, with given prefix 
+    public  void comb(ArrayList<Entry> prefix, ArrayList<Entry> e) {
+        if (e.size() > 0) {
+            for(int i = 0; i < prefix.size(); i++)
+                System.out.print(prefix.get(i).getValue()+", ");
+            System.out.println(e.get(0).getValue());
+            //System.out.println(prefix + e.get(0).getValue());
+            ArrayList<Entry> temp = new ArrayList<>();
+            for(int j = 1; j < e.size(); j++)
+                temp.add(e.get(j));
+            prefix.add(e.get(0));
+            comb(prefix, temp);
+            prefix.remove(prefix.size()-1);
+            comb(prefix, temp);
+            
+        }
+    }  
 }

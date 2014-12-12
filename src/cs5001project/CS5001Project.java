@@ -92,11 +92,11 @@ public class CS5001Project {
         }
         maxSize = scanner.nextInt();
         
-        //Apriori apriori = new Apriori(filePath, minCoverage, maxSize);
-        //apriori.createSet();
+        Apriori apriori = new Apriori(filePath, minCoverage, maxSize);
+        apriori.createSet();
         
-        FPGrowth fp = new FPGrowth(filePath, minCoverage);
-        fp.createFrequentSet();
+        //FPGrowth fp = new FPGrowth(filePath, minCoverage);
+        //fp.createFrequentSet();
         
         
         /*
