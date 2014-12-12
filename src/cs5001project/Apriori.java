@@ -45,8 +45,6 @@ public class Apriori {
         
         numAttributes = data.numAttributes();
         numInstances = data.numInstances();
-        
-        System.out.println((data.toString()));
     }
     
     
@@ -56,7 +54,7 @@ public class Apriori {
         
         //Loops through the dataset and creates an array containing every value and counts how often that value appears
         for(int col = 0; col < numAttributes; col++) {
-        for(int row = 0; row < numInstances; row++) { 
+            for(int row = 0; row < numInstances; row++) { 
                 for(int k = 0; k < initialSet.size(); k++) {
                     //if the initialSet contains the current value, then stop looking and increment count
                     if((initialSet.get(k).getValue()).equals(data.instance(row).stringValue(col)) && (initialSet.get(k).getAttNum() == col) ) {
@@ -79,46 +77,60 @@ public class Apriori {
                 dataSet.add(0, new ItemSet(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));
             }     
         } 
-        System.out.println(numInstances+"\n");
+
+
         if(dataSet.isEmpty()) 
             System.out.println("None of the item sets met the min coverage");
         else 
             recursiveSetBuild(0);
-        
-        /*for(int i = 0; i <dataSet.size(); i++) {
+       
+        for(int i = 0; i <dataSet.size(); i++) {
             System.out.println();
             for(int j = 0; j < dataSet.get(i).size(); j++)
-                System.out.print(dataSet.get(i).get(j).value+", ");
-        }*/
+                System.out.print(dataSet.get(i).get(j).getValue()+", ");
+        }
     }
     
     public void recursiveSetBuild(int startIndex) {
         int start = startIndex;
         int startSize = dataSet.size();
-        
+        int startSetSize = dataSet.get(startSize-1).size();
+       
         if(dataSet.get(startSize-1).size() >= numAttributes) {
             return;
         }
         
         for(int row = start; row < startSize; row++) {
+            
             for(int j = 0; j < initialSet.size(); j++) {
-                if(!dataSet.get(row).containsAtt(initialSet.get(j).getAttNum())) {
-                    //Prevents having itemSets with the same values in different orders
-                    if(initialSet.get(j).getAttNum() > dataSet.get(row).get(dataSet.get(row).size()-1).getAttNum()) {
-                        dataSet.add(new ItemSet(dataSet.get(row)));
-                        dataSet.get(dataSet.size()-1).add(initialSet.get(j).getValue(), initialSet.get(j).getAttNum());
-                    }
+                if(initialSet.get(j).getAttNum() > dataSet.get(row).get(dataSet.get(row).size()-1).getAttNum()) {
+                    dataSet.add(new ItemSet(dataSet.get(row)));
+                    dataSet.get(dataSet.size()-1).add(initialSet.get(j).getValue(), initialSet.get(j).getAttNum());
+                }
+            }
+        }
+       
+        for(int row = startSize; row < dataSet.size(); row++) {
+            for(int inst = 0; inst < numInstances; inst++) {
+                if(dataSet.get(row).isIn(data.instance(inst))) {
+                    dataSet.get(row).countInc();
                 }
             }
         }
         
-        System.out.println(dataSet.size()-startSize);
-        /*for(int row = startSize; row < dataSet.size(); row++) {
-            for(int inst = 0; inst < numInstances; inst++) {
-                
-            }
-        }*/
+
         
+        
+        for(int row = dataSet.size()-1; row >= startSize; row--) {
+            if(dataSet.get(row).getCount() < minCount)
+                dataSet.remove(row);
+        }
+        
+        
+        //If none of the new sets met the min coverage, then the set builder is finished
+        if(dataSet.get(dataSet.size()-1).size() == startSetSize) 
+            return;
+       
         
         recursiveSetBuild(startSize);
     }

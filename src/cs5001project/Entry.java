@@ -9,8 +9,8 @@ package cs5001project;
  * @author Kelsey
  */
 public class Entry {
-    int count, attributeNum;
-    String value;
+    private int count, attributeNum;
+    private String value;
     
     public Entry(String val, int attNum) {
         count = 0;
