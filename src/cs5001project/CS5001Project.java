@@ -60,19 +60,6 @@ public class CS5001Project {
             filePath = System.getProperty("user.dir")+"/"+file+".arff";
         }
         
-        //reader = new BufferedReader(new FileReader(filePath));
-        //arff = new ArffReader(reader);
-        //data = arff.getData();
-        //data.setClassIndex(data.numAttributes() - 1);
-        
-        //SparseInstance si = new SparseInstance(data.instance(1));
-        
-        
-        //System.out.println(si.toString(1));
-        //data.sort(0);
-        
-        //System.out.println((data.instance(1).stringValue(3)));
-        
         
         System.out.println("\nMinimum coverage requirements (how many times that value should appear at minimum): ");
         while(!scanner.hasNextInt()){
@@ -121,6 +108,7 @@ public class CS5001Project {
         FPGrowth fp = new FPGrowth(filePath, minCoverage);
         fp.createFrequentSet();
         fp.sortInstances();
+        fp.createFPTree();
         
         
         

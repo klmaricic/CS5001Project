@@ -22,17 +22,24 @@ import weka.core.converters.ArffLoader;
  * @author Kelsey
  */
 public class FPGrowth {
-    private int numAttributes, numInstances, minCount, maxEntries;
+    private int numAttributes, numInstances, minCount, maxSetSize, numRules, maxEntries;
+    double minAccuracy;
     private String file, line = "";
     private BufferedReader br = null;
     private ArffLoader.ArffReader arff;
     private Instances data;
     private ArrayList<Entry> frequentSet = new ArrayList<>();
     private ArrayList<ItemSet> dataSet = new ArrayList<>();
+    private ArrayList<ItemSet> consequents = new ArrayList<>();
+    private ArrayList<ItemSet> antecedents = new ArrayList<>();
+    private ArrayList<RuleSet> rules = new ArrayList<>();
     
-    public FPGrowth(String filePath, int minCoverage){
+    public FPGrowth(String filePath, int minCoverage, int maxSize, double a, int rules){
         file = filePath;
-        minCount= minCoverage;
+        minCount = minCoverage;
+        maxSetSize = maxSize;
+        minAccuracy = a;
+        numRules = rules;
         
         try{
             br = new BufferedReader(new FileReader(file));  
@@ -51,35 +58,6 @@ public class FPGrowth {
     }
     
     public void createFrequentSet() {
-        /*Loops through the dataset and creates an array containing every value and counts how often that value appears
-        for(int i = 0; i < numInstances; i++) {
-            for(int j = 0; j < numAttributes; j++) {
-                for(int k = 0; k < frequentSet.size(); k++) {
-                    //if the frequentSet contains the current value, then stop looking and increment count
-                    if((frequentSet.get(k).getValue()).equals(data.instance(i).stringValue(j)) && (frequentSet.get(k).getAttNum() != j) ) {
-                        int index = frequentSet.indexOf(new Entry(data.instance(i).stringValue(j), j));
-                        frequentSet.get(index).countIncrement();
-                        break;
-                    }
-                    //If it searched through the entire set and did not find the value, then add it
-                    else if(k == frequentSet.size()-1)
-                        frequentSet.add(new Entry(data.instance(i).stringValue(j), j));
-                }
-            }
-        }
-        
-        //removes all entries that don't meet the minimum coverage
-        for(int i = frequentSet.size()-1; i >= 0; i--) {
-            if(frequentSet.get(i).getCount() < minCount) {
-                frequentSet.remove(i);
-            }
-        }*/
-        
-        /*if(maxSetSize == 0) {
-            System.out.println("Max set size was 0, so no sets can be built");
-            return;
-        }*/
-        
         //Add value so initialSet isn't empty
         frequentSet.add(new Entry(data.instance(0).stringValue(0), 0));
         
@@ -151,7 +129,141 @@ public class FPGrowth {
         //Max possible number of entries in an instance after sort instances
         maxEntries = frequentSet.size();
         Tree fpTree = new Tree();
-        fpTree.buildTree(dataSet, maxEntries);
+        //fpTree.buildTree(dataSet, maxEntries);
+        
+        for(int set = 0; set < dataSet.size()-1; set++) {
+            comb(dataSet.get(set).getArr());
+            sortConsequents();
+        
+            for(int i = consequents.size()-2; i >= 0; i--)
+                antecedents.add(consequents.get(i));
+        
+            //Finds the accuracy of each rule
+            for(int ant =0; ant < antecedents.size(); ant++) {
+                for(int row = 0; row < data.numInstances(); row++) {
+                    for(int e = 0; e < antecedents.get(ant).size(); e++) {
+                        int num = antecedents.get(ant).get(e).getAttNum();
+                        //If the antecedent condition does not match the instance
+                        if(!(antecedents.get(ant).get(e).getValue().equals(data.instance(row).toString(num))))
+                            break;
+                        //If all of the antecedent conditions match the instance
+                        if(e >= (antecedents.get(ant).size()-1)) {
+                            antecedents.get(ant).incDenom();
+                        
+                            for(int c = 0; c < consequents.get(ant).size(); c++) {
+                                num = consequents.get(ant).get(c).getAttNum();
+                                //If the consequents condition does not match the instance
+                                if(!(consequents.get(ant).get(c).getValue().equals(data.instance(row).toString(num))))
+                                    break;
+                                //If all of the consequents conditions match the instance
+                                if(c >= (consequents.get(ant).size()-1)) {
+                                    antecedents.get(ant).incNum();
+                                }
+                            }
+                        }
+                    }
+                }
+            
+                if((antecedents.get(ant).getDenom() != 0) && (antecedents.get(ant).getAccuracy() >= minAccuracy)) 
+                    rules.add(new RuleSet(antecedents.get(ant).getArr(), consequents.get(ant).getArr(), antecedents.get(ant).getAccuracy()));
+                else {
+                    for(int i= (antecedents.size()-1); i > ant; i--) {
+                        if(antecedents.get(ant).contains(antecedents.get(i)))
+                            antecedents.remove(i);
+                    }
+                }
+            }
+
+            antecedents.clear();
+            consequents.clear();       
+        
+        }
+        
+        sortRules();
+        
+        System.out.println();
+        if(numRules == -1) {
+            System.out.println("All of the rules meeting your requirements are:");
+            for(int i = 0; i < rules.size(); i++)
+            rules.get(i).print(data);
+        }
+        else {
+            System.out.println("The top "+numRules+" rules matching your requirements are:");
+            for(int i = 0; i < numRules; i++) {
+                if(i >= rules.size()) {
+                    System.out.println("There are no more rules matching the accuracy requirement");
+                    break;
+                }
+                rules.get(i).print(data);
+            }
+        }
+            
+    }
+    
+    public void comb(ArrayList<Entry> e) { 
+        comb(new ArrayList<Entry>(), e); 
+    }
+
+    
+    public  void comb(ArrayList<Entry> prefix, ArrayList<Entry> e) {
+        if (e.size() > 0) {
+            consequents.add(new ItemSet());
+            for(int i = 0; i < prefix.size(); i++) {
+                //System.out.print(prefix.get(i).getValue()+", ");
+                consequents.get(consequents.size()-1).add(prefix.get(i).getValue(), prefix.get(i).getAttNum());
+            }
+            consequents.get(consequents.size()-1).add(e.get(0).getValue(), e.get(0).getAttNum());
+            //System.out.println(e.get(0).getValue());
+            
+            
+            ArrayList<Entry> temp = new ArrayList<>();
+            
+            for(int j = 1; j < e.size(); j++)
+                temp.add(e.get(j));
+            
+            prefix.add(e.get(0));
+            comb(prefix, temp);
+            
+            prefix.remove(prefix.size()-1);
+            comb(prefix, temp);
+            
+        }
+    }  
+    
+    public void sortConsequents() {
+        int j;
+        boolean flag = true;   // set flag to true to begin first pass
+        ItemSet temp;   //holding variable
+
+        while (flag) {
+            flag= false;    //set flag to false awaiting a possible swap
+            for(j=0;  j < consequents.size()-1;  j++) {
+                if(consequents.get(j).size() > consequents.get(j+1).size()) {
+                    temp = consequents.get(j);                //swap elements
+                    consequents.set(j, consequents.get(j+1));
+                    consequents.set(j+1, temp);
+                    flag = true;              //shows a swap occurred  
+                } 
+            } 
+        } 
+    }
+    
+    public void sortRules() {
+        int j;
+        boolean flag = true;   // set flag to true to begin first pass
+        RuleSet temp;   //holding variable
+
+        while (flag) {
+            flag= false;    //set flag to false awaiting a possible swap
+            for(j=0;  j < rules.size()-1;  j++) {
+                if(rules.get(j).getAccuracy() < rules.get(j+1).getAccuracy()) {
+                    temp = rules.get(j);                //swap elements
+                    rules.set(j, rules.get(j+1));
+                    rules.set(j+1, temp);
+                    flag = true;              //shows a swap occurred  
+                } 
+            } 
+        } 
     }
     
     public void bubbleSort() {
