@@ -19,7 +19,7 @@ import weka.core.converters.ArffLoader;
  * @author Kelsey
  */
 public class Apriori {
-    int numAttributes, numInstances, minCount;
+    int numAttributes, numInstances, minCount, maxSetSize;
     String file, line = "";
     BufferedReader br = null;
     ArffLoader.ArffReader arff;
@@ -27,9 +27,10 @@ public class Apriori {
     private ArrayList<Entry> initialSet = new ArrayList<>();
     private ArrayList<ItemSet> dataSet = new ArrayList<>();
     
-    public Apriori(String filePath, int minCoverage){
+    public Apriori(String filePath, int minCoverage, int maxSize){
         file = filePath;
         minCount = minCoverage;
+        maxSetSize = maxSize;
         
         try{
             br = new BufferedReader(new FileReader(file));  
@@ -49,6 +50,11 @@ public class Apriori {
     
     
     public void createSet() {
+        if(maxSetSize == 0) {
+            System.out.println("Max set size was 0, so no sets can be built");
+            return;
+        }
+        
         //Add value so initialSet isn't empty
         initialSet.add(new Entry(data.instance(0).stringValue(0), 0));
         
@@ -100,6 +106,9 @@ public class Apriori {
             return;
         }
         
+        if(dataSet.get(dataSet.size()-1).size() >= maxSetSize)
+            return;
+        
         for(int row = start; row < startSize; row++) {
             
             for(int j = 0; j < initialSet.size(); j++) {
@@ -133,5 +142,9 @@ public class Apriori {
        
         
         recursiveSetBuild(startSize);
+    }
+    
+    public void createRules() {
+        
     }
 }
