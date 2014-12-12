@@ -48,12 +48,10 @@ public class FPGrowth {
         
         numAttributes = data.numAttributes();
         numInstances = data.numInstances();
-        
-        System.out.println((data.toString()));
     }
     
     public void createFrequentSet() {
-        //Loops through the dataset and creates an array containing every value and counts how often that value appears
+        /*Loops through the dataset and creates an array containing every value and counts how often that value appears
         for(int i = 0; i < numInstances; i++) {
             for(int j = 0; j < numAttributes; j++) {
                 for(int k = 0; k < frequentSet.size(); k++) {
@@ -75,11 +73,47 @@ public class FPGrowth {
             if(frequentSet.get(i).getCount() < minCount) {
                 frequentSet.remove(i);
             }
+        }*/
+        
+        /*if(maxSetSize == 0) {
+            System.out.println("Max set size was 0, so no sets can be built");
+            return;
+        }*/
+        
+        //Add value so initialSet isn't empty
+        frequentSet.add(new Entry(data.instance(0).stringValue(0), 0));
+        
+        //Loops through the dataset and creates an array containing every value and counts how often that value appears
+        for(int col = 0; col < numAttributes; col++) {
+            for(int row = 0; row < numInstances; row++) { 
+                for(int k = 0; k < frequentSet.size(); k++) {
+                    //if the initialSet contains the current value, then stop looking and increment count
+                    if((frequentSet.get(k).getValue()).equals(data.instance(row).stringValue(col)) && (frequentSet.get(k).getAttNum() == col) ) {
+                        frequentSet.get(k).countIncrement();
+                        break;
+                    }
+                    //If it searched through the entire set and did not find the value, then add it
+                    else if(k == frequentSet.size()-1)
+                        frequentSet.add(new Entry(data.instance(row).stringValue(col), col));
+                }
+            }
         }
+
+        //removes all entries that don't meet the minimum coverage
+        for(int i = frequentSet.size()-1; i >= 0; i--) {
+            if(frequentSet.get(i).getCount() < minCount)
+                frequentSet.remove(i);  
+        } 
         
         //Organizes the entries from highest coverage to lowest
-        MergeSort mergeSorter = new MergeSort();
-        mergeSorter.sort(frequentSet);
+        //MergeSort mergeSorter = new MergeSort();
+        //mergeSorter.sort(frequentSet);
+        
+        bubbleSort();
+        
+        for(int i = 0; i < frequentSet.size(); i++) {
+            System.out.println(frequentSet.get(i).getValue());
+        }
     }
     
     //Sorts the values of each instance in descending order based on frequency
@@ -106,5 +140,23 @@ public class FPGrowth {
         Tree fpTree = new Tree();
         fpTree.buildTree(dataSet, maxEntries);
     }
+    
+    public void bubbleSort() {
+        int j;
+        boolean flag = true;   // set flag to true to begin first pass
+        Entry temp;   //holding variable
+
+        while (flag) {
+            flag= false;    //set flag to false awaiting a possible swap
+            for(j=0;  j < frequentSet.size()-1;  j++) {
+                if(frequentSet.get(j).getCount() < frequentSet.get(j+1).getCount()) {
+                    temp = frequentSet.get(j);                //swap elements
+                    frequentSet.set(j, frequentSet.get(j+1));
+                    frequentSet.set(j+1, temp);
+                    flag = true;              //shows a swap occurred  
+                } 
+            } 
+        } 
+    } 
 }
 

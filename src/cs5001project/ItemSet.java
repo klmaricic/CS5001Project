@@ -40,6 +40,10 @@ public class ItemSet {
         return instance.get(i);
     }
     
+    public ArrayList<Entry> getArr() {
+        return instance;
+    }
+    
     public void add(String val, int attNum) {
         instance.add(new Entry(val, attNum));
     }

@@ -27,6 +27,9 @@ public class Apriori {
     private ArrayList<Entry> initialSet = new ArrayList<>();
     private ArrayList<ItemSet> dataSet = new ArrayList<>();
     
+    ArrayList<Entry> a = new ArrayList<>();
+    ArrayList<Entry> c = new ArrayList<>();
+    
     public Apriori(String filePath, int minCoverage, int maxSize){
         file = filePath;
         minCount = minCoverage;
@@ -95,6 +98,8 @@ public class Apriori {
             for(int j = 0; j < dataSet.get(i).size(); j++)
                 System.out.print(dataSet.get(i).get(j).getValue()+", ");
         }
+        
+        permute(dataSet.get(dataSet.size()-1).getArr(), 0);
     }
     
     public void recursiveSetBuild(int startIndex) {
@@ -143,8 +148,31 @@ public class Apriori {
         
         recursiveSetBuild(startSize);
     }
-    
-    public void createRules() {
-        
+    public void permute(ArrayList<Entry> arr, int k){
+        for(int i = k; i < arr.size(); i++){
+            java.util.Collections.swap(arr, i, k);
+            permute(arr, k+1);
+            java.util.Collections.swap(arr, k, i);
+        }
+        if (k == arr.size() -1){
+            //System.out.println(java.util.Arrays.toString(arr.toArray()));
+            for(int i = 0; i < arr.size(); i++) {
+                for(int j = 0; j < i; j++)
+                    a.add(arr.get(j));
+                for(int m = i; m < arr.size(); m++)
+                    c.add(arr.get(m));
+                
+                System.out.print("\na: ");
+                for(int m = 0; m < a.size(); m++)
+                    System.out.print(a.get(m).getValue()+", ");
+                
+                System.out.print("\nc: ");
+                for(int n = 0; n < c.size(); n++)
+                    System.out.print(c.get(n).getValue()+", ");
+                
+                a.clear();
+                c.clear();
+            } //LOOK UP COMBINATIONS
+        }
     }
 }

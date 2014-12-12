@@ -82,10 +82,8 @@ public class CS5001Project {
         }
         minCoverage = scanner.nextInt();
         
-        Apriori apriori = new Apriori(filePath, minCoverage);
-        apriori.createSet();
         
-        /*
+        
         System.out.println("\nMaximum size of item sets to consider: ");
         while(!scanner.hasNextInt()){
             System.out.println("Invalid input. Please enter an int-type number.\n");
@@ -94,6 +92,14 @@ public class CS5001Project {
         }
         maxSize = scanner.nextInt();
         
+        //Apriori apriori = new Apriori(filePath, minCoverage, maxSize);
+        //apriori.createSet();
+        
+        FPGrowth fp = new FPGrowth(filePath, minCoverage);
+        fp.createFrequentSet();
+        
+        
+        /*
         System.out.println("\nMinimum accuracy requirements: ");
         while(!scanner.hasNextDouble()){
             System.out.println("Invalid input. Must enter a double-type number. So for 60%, type 0.6.\n");
