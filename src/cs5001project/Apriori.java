@@ -21,20 +21,22 @@ import weka.core.converters.ArffLoader;
  */
 public class Apriori {
     int numAttributes, numInstances, minCount, maxSetSize;
+    double minAccuracy;
     String file, line = "";
     BufferedReader br = null;
     ArffLoader.ArffReader arff;
     Instances data;
     private ArrayList<Entry> initialSet = new ArrayList<>();
     private ArrayList<ItemSet> dataSet = new ArrayList<>();
+    private ArrayList<ItemSet> consequents = new ArrayList<>();
+    private ArrayList<ItemSet> antecedents = new ArrayList<>();
+    private ArrayList<RuleSet> rules = new ArrayList<>();
     
-    ArrayList<Entry> a = new ArrayList<>();
-    ArrayList<Entry> c = new ArrayList<>();
-    
-    public Apriori(String filePath, int minCoverage, int maxSize){
+    public Apriori(String filePath, int minCoverage, int maxSize, double a){
         file = filePath;
         minCount = minCoverage;
         maxSetSize = maxSize;
+        minAccuracy = a;
         
         try{
             br = new BufferedReader(new FileReader(file));  
@@ -99,9 +101,6 @@ public class Apriori {
             for(int j = 0; j < dataSet.get(i).size(); j++)
                 System.out.print(dataSet.get(i).get(j).getValue()+", ");
         }
-        System.out.println("\n----------------------------");
-        dataSet.get(dataSet.size()-1).print();
-        comb(dataSet.get(dataSet.size()-1).getArr());
     }
     
     public void recursiveSetBuild(int startIndex) {
@@ -150,25 +149,118 @@ public class Apriori {
         
         recursiveSetBuild(startSize);
     }
+    
+    public void createRules() {
+        //for(int i = 0; i < dataSet.size(); i++) {
+        //    comb(dataSet.get(i).getArr());
+        //}
+        System.out.println();
+        dataSet.get(dataSet.size()-1).print();
+        comb(dataSet.get(dataSet.size()-1).getArr());
+        sortConsequents();
+        
+        for(int i = consequents.size()-2; i >= 0; i--){
+            antecedents.add(consequents.get(i));
+        }
+        System.out.println("ANTECEDENTS");
+        for(int i = 0; i < antecedents.size(); i++){
+            antecedents.get(i).print();
+            System.out.println();
+        }
+        System.out.println("/ANTECEDENTS");
+            
+        
+        //Finds the accuracy of each rule
+        for(int ant =0; ant < antecedents.size(); ant++) {
+            for(int row = 0; row < data.numInstances(); row++) {
+                for(int e = 0; e < antecedents.get(ant).size(); e++) {
+                    int num = antecedents.get(ant).get(e).getAttNum();
+                    //If the antecedent condition does not match the instance
+                    if(!(antecedents.get(ant).get(e).getValue().equals(data.instance(row).toString(num))))
+                        break;
+                    //If all of the antecedent conditions match the instance
+                    if(e >= (antecedents.get(ant).size()-1)) {
+                        antecedents.get(ant).incDenom();
+                        
+                        for(int c = 0; c < consequents.get(ant).size(); c++) {
+                            num = consequents.get(ant).get(c).getAttNum();
+                            //If the consequents condition does not match the instance
+                            if(!(consequents.get(ant).get(c).getValue().equals(data.instance(row).toString(num))))
+                                break;
+                            //If all of the consequents conditions match the instance
+                            if(c >= (consequents.get(ant).size()-1)) {
+                                antecedents.get(ant).incNum();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if((antecedents.get(ant).getDenom() != 0) && (antecedents.get(ant).getAccuracy() >= minAccuracy)) 
+                    rules.add(new RuleSet(antecedents.get(ant).getArr(), consequents.get(ant).getArr(), antecedents.get(ant).getAccuracy()));
+            else {
+                for(int i= (antecedents.size()-1); i > ant; i--) {
+                    if(antecedents.get(ant).contains(antecedents.get(i)))
+                        antecedents.remove(i);
+                }
+            }
+        }
+        System.out.println("CUT ANTECEDENTS");
+        for(int i = 0; i < antecedents.size(); i++){
+            antecedents.get(i).print();
+            System.out.println();
+        }
+        System.out.println("RULES");
+        for(int i = 0; i < rules.size(); i++)
+            rules.get(i).print();
+            
+    }
+    
     public void comb(ArrayList<Entry> e) { 
         comb(new ArrayList<Entry>(), e); 
     }
 
-    // print all subsets of the remaining elements, with given prefix 
+    
     public  void comb(ArrayList<Entry> prefix, ArrayList<Entry> e) {
         if (e.size() > 0) {
-            for(int i = 0; i < prefix.size(); i++)
-                System.out.print(prefix.get(i).getValue()+", ");
-            System.out.println(e.get(0).getValue());
-            //System.out.println(prefix + e.get(0).getValue());
+            consequents.add(new ItemSet());
+            for(int i = 0; i < prefix.size(); i++) {
+                //System.out.print(prefix.get(i).getValue()+", ");
+                consequents.get(consequents.size()-1).add(prefix.get(i).getValue(), prefix.get(i).getAttNum());
+            }
+            consequents.get(consequents.size()-1).add(e.get(0).getValue(), e.get(0).getAttNum());
+            //System.out.println(e.get(0).getValue());
+            
+            
             ArrayList<Entry> temp = new ArrayList<>();
+            
             for(int j = 1; j < e.size(); j++)
                 temp.add(e.get(j));
+            
             prefix.add(e.get(0));
             comb(prefix, temp);
+            
             prefix.remove(prefix.size()-1);
             comb(prefix, temp);
             
         }
     }  
+    
+    public void sortConsequents() {
+        int j;
+        boolean flag = true;   // set flag to true to begin first pass
+        ItemSet temp;   //holding variable
+
+        while (flag) {
+            flag= false;    //set flag to false awaiting a possible swap
+            for(j=0;  j < consequents.size()-1;  j++) {
+                if(consequents.get(j).size() > consequents.get(j+1).size()) {
+                    temp = consequents.get(j);                //swap elements
+                    consequents.set(j, consequents.get(j+1));
+                    consequents.set(j+1, temp);
+                    flag = true;              //shows a swap occurred  
+                } 
+            } 
+        } 
+    }
 }

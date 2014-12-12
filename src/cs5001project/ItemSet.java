@@ -14,10 +14,13 @@ import weka.core.Instance;
 public class ItemSet {
 
     private int count;
+    private double denominator, numerator;
     private ArrayList<Entry> instance;
 
     public ItemSet() {
         count = 0;
+        denominator = 0;
+        numerator = 0;
         instance = new ArrayList<>();
     }
     
@@ -25,6 +28,8 @@ public class ItemSet {
     public ItemSet(ItemSet set) {
         instance = new ArrayList<>(set.size()+1);
         count = 0;
+        denominator = 0;
+        numerator= 0;
         for(int i =0; i <set.size(); i++) {
             instance.add(set.get(i));
         }
@@ -34,6 +39,7 @@ public class ItemSet {
         instance = new ArrayList<>();
         instance.add(new Entry(val, attNum));
         count = 0;
+        denominator = 0;numerator = 0;
     }
 
     public Entry get(int i) {
@@ -83,5 +89,41 @@ public class ItemSet {
         for(int i = 0; i < instance.size(); i++)
             System.out.print(instance.get(i).getValue()+"("+instance.get(i).getAttNum()+")"+", ");
         System.out.println();
+    }
+    
+    public void incDenom() {
+        denominator++;
+    }
+    
+    public void incNum() {
+        numerator++;
+    }
+    
+    public double getAccuracy() {
+        return numerator/denominator;
+    }
+    
+    public double getDenom() {
+        return denominator;
+    }
+    
+    public boolean contains(ItemSet a) {
+        if(this.size() == 0)
+            return false;
+        
+        if(a.size() == 0)
+            return true;
+        
+        for(int i = 0; i < a.size(); i++) {
+            for(int j = 0; j < this.size(); j++) {
+                if(a.get(i).getValue().equals(this.get(j).getValue()) && a.get(i).getAttNum() == this.get(j).getAttNum())
+                    break;
+                else if(j >= this.size()-1)
+                    return false;
+            }
+            
+        }
+        
+        return true;
     }
 }
