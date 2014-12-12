@@ -6,6 +6,7 @@ package cs5001project;
 
 import java.util.ArrayList;
 import weka.core.Instance;
+import weka.core.Instances;
 
 /**
  *
@@ -41,6 +42,13 @@ public class ItemSet {
         count = 0;
         denominator = 0;numerator = 0;
     }
+    
+    public ItemSet(String val, int attNum, int c) {
+        instance = new ArrayList<>();
+        instance.add(new Entry(val, attNum));
+        count = c;
+        denominator = 0;numerator = 0;
+    }
 
     public Entry get(int i) {
         return instance.get(i);
@@ -52,6 +60,7 @@ public class ItemSet {
     
     public void add(String val, int attNum) {
         instance.add(new Entry(val, attNum));
+        
     }
     
     public int getCount() {
@@ -85,10 +94,17 @@ public class ItemSet {
         return true;
     }
     
-    public void print() {
-        for(int i = 0; i < instance.size(); i++)
-            System.out.print(instance.get(i).getValue()+"("+instance.get(i).getAttNum()+")"+", ");
-        System.out.println();
+    public void print(Instances data) {
+        
+        for(int i = 0; i < instance.size(); i++) {
+            int attNum = instance.get(i).getAttNum();
+            if(i < instance.size()-1)
+                System.out.print(data.attribute(attNum).name()+" = "+instance.get(i).getValue()+", ");
+            else
+                System.out.print(data.attribute(attNum).name()+" = "+instance.get(i).getValue());
+        }
+                
+        System.out.println(" (Coverage = "+count+")");
     }
     
     public void incDenom() {

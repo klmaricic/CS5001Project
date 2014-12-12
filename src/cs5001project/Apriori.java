@@ -87,13 +87,18 @@ public class Apriori {
                 initialSet.remove(i);
             //If the 1-item set meets the min coverage, add to dataset
             else 
-                dataSet.add(0, new ItemSet(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));   
+                dataSet.add(0, new ItemSet(initialSet.get(i).getValue(), initialSet.get(i).getAttNum(), initialSet.get(i).getCount()));   
         } 
 
         if(dataSet.isEmpty()) 
             System.out.println("None of the item sets met the min coverage");
         else 
             recursiveSetBuild(0);
+        
+        
+        for(int i = 0; i < dataSet.size(); i++) {
+            dataSet.get(i).print(data);
+        }
     }
     
     public void recursiveSetBuild(int startIndex) {
@@ -137,78 +142,71 @@ public class Apriori {
     }
     
     public void createRules() {
+        for(int set = 0; set < dataSet.size()-1; set++) {
+            comb(dataSet.get(set).getArr());
+            sortConsequents();
         
-        comb(dataSet.get(dataSet.size()-1).getArr());
-        sortConsequents();
+            for(int i = consequents.size()-2; i >= 0; i--)
+                antecedents.add(consequents.get(i));
         
-        for(int i = consequents.size()-2; i >= 0; i--){
-            antecedents.add(consequents.get(i));
-        }
-        System.out.println("ANTECEDENTS");
-        for(int i = 0; i < antecedents.size(); i++){
-            antecedents.get(i).print();
-            System.out.println();
-        }
-        System.out.println("/ANTECEDENTS");
-            
-        
-        //Finds the accuracy of each rule
-        for(int ant =0; ant < antecedents.size(); ant++) {
-            for(int row = 0; row < data.numInstances(); row++) {
-                for(int e = 0; e < antecedents.get(ant).size(); e++) {
-                    int num = antecedents.get(ant).get(e).getAttNum();
-                    //If the antecedent condition does not match the instance
-                    if(!(antecedents.get(ant).get(e).getValue().equals(data.instance(row).toString(num))))
-                        break;
-                    //If all of the antecedent conditions match the instance
-                    if(e >= (antecedents.get(ant).size()-1)) {
-                        antecedents.get(ant).incDenom();
+            //Finds the accuracy of each rule
+            for(int ant =0; ant < antecedents.size(); ant++) {
+                for(int row = 0; row < data.numInstances(); row++) {
+                    for(int e = 0; e < antecedents.get(ant).size(); e++) {
+                        int num = antecedents.get(ant).get(e).getAttNum();
+                        //If the antecedent condition does not match the instance
+                        if(!(antecedents.get(ant).get(e).getValue().equals(data.instance(row).toString(num))))
+                            break;
+                        //If all of the antecedent conditions match the instance
+                        if(e >= (antecedents.get(ant).size()-1)) {
+                            antecedents.get(ant).incDenom();
                         
-                        for(int c = 0; c < consequents.get(ant).size(); c++) {
-                            num = consequents.get(ant).get(c).getAttNum();
-                            //If the consequents condition does not match the instance
-                            if(!(consequents.get(ant).get(c).getValue().equals(data.instance(row).toString(num))))
-                                break;
-                            //If all of the consequents conditions match the instance
-                            if(c >= (consequents.get(ant).size()-1)) {
-                                antecedents.get(ant).incNum();
+                            for(int c = 0; c < consequents.get(ant).size(); c++) {
+                                num = consequents.get(ant).get(c).getAttNum();
+                                //If the consequents condition does not match the instance
+                                if(!(consequents.get(ant).get(c).getValue().equals(data.instance(row).toString(num))))
+                                    break;
+                                //If all of the consequents conditions match the instance
+                                if(c >= (consequents.get(ant).size()-1)) {
+                                    antecedents.get(ant).incNum();
+                                }
                             }
                         }
                     }
                 }
-            }
             
-            if((antecedents.get(ant).getDenom() != 0) && (antecedents.get(ant).getAccuracy() >= minAccuracy)) 
+                if((antecedents.get(ant).getDenom() != 0) && (antecedents.get(ant).getAccuracy() >= minAccuracy)) 
                     rules.add(new RuleSet(antecedents.get(ant).getArr(), consequents.get(ant).getArr(), antecedents.get(ant).getAccuracy()));
-            else {
-                for(int i= (antecedents.size()-1); i > ant; i--) {
-                    if(antecedents.get(ant).contains(antecedents.get(i)))
-                        antecedents.remove(i);
+                else {
+                    for(int i= (antecedents.size()-1); i > ant; i--) {
+                        if(antecedents.get(ant).contains(antecedents.get(i)))
+                            antecedents.remove(i);
+                    }
                 }
             }
+
+            antecedents.clear();
+            consequents.clear();       
+        
         }
-        System.out.println("CUT ANTECEDENTS");
-        for(int i = 0; i < antecedents.size(); i++){
-            antecedents.get(i).print();
-            System.out.println();
-        }
-        System.out.println("RULES");
-        for(int i = 0; i < rules.size(); i++)
-            rules.get(i).print();
         
         sortRules();
         
-        System.out.println("SORTED RULES");
-        for(int i = 0; i < rules.size(); i++)
-            rules.get(i).print();
-        
-        System.out.println("The top "+numRules+" are:");
-        for(int i = 0; i < numRules; i++) {
-            if(i >= rules.size()) {
-                System.out.println("There are no more rules matching the accuracy requirement");
-                break;
+        System.out.println();
+        if(numRules == -1) {
+            System.out.println("All of the rules meeting your requirements are:");
+            for(int i = 0; i < rules.size(); i++)
+            rules.get(i).print(data);
+        }
+        else {
+            System.out.println("The top "+numRules+" rules matching your requirements are:");
+            for(int i = 0; i < numRules; i++) {
+                if(i >= rules.size()) {
+                    System.out.println("There are no more rules matching the accuracy requirement");
+                    break;
+                }
+                rules.get(i).print(data);
             }
-            rules.get(i).print();
         }
             
     }
@@ -269,7 +267,7 @@ public class Apriori {
         while (flag) {
             flag= false;    //set flag to false awaiting a possible swap
             for(j=0;  j < rules.size()-1;  j++) {
-                if(rules.get(j).getAccuracy() < consequents.get(j+1).getAccuracy()) {
+                if(rules.get(j).getAccuracy() < rules.get(j+1).getAccuracy()) {
                     temp = rules.get(j);                //swap elements
                     rules.set(j, rules.get(j+1));
                     rules.set(j+1, temp);
