@@ -107,10 +107,8 @@ public class CS5001Project {
         }
         minAccuracy = scanner.nextDouble();
         
-        Apriori apriori = new Apriori(filePath, minCoverage, maxSize, minAccuracy);
-        apriori.createSet();
-        apriori.createRules();
-        /*
+        
+        
         do{
             System.out.println("\nNumber of best rule to report (enter * if you would like all rules listed): ");
             numRulesStr = scanner.next();
@@ -123,6 +121,9 @@ public class CS5001Project {
             numRules = Integer.parseInt(numRulesStr);
         }
         
+        Apriori apriori = new Apriori(filePath, minCoverage, maxSize, minAccuracy, numRules);
+        apriori.createSet();
+        apriori.createRules();
         
         
         
@@ -138,7 +139,5 @@ public class CS5001Project {
         }
     
         return true;
-    }
-    */
-    }
+    }  
 }

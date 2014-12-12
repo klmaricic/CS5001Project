@@ -30,4 +30,7 @@ public class RuleSet {
         System.out.println(accuracy+"%");
     }
     
+    public double getAccuracy() {
+        return accuracy;
+    }
 }
