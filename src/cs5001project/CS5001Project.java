@@ -83,7 +83,7 @@ public class CS5001Project {
         minCoverage = scanner.nextInt();
         
         Apriori apriori = new Apriori(filePath, minCoverage);
-        apriori.createInitialSet();
+        apriori.createSet();
         
         /*
         System.out.println("\nMaximum size of item sets to consider: ");

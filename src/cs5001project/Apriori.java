@@ -50,7 +50,7 @@ public class Apriori {
     }
     
     
-    public void createInitialSet() {
+    public void createSet() {
         //Add value so initialSet isn't empty
         initialSet.add(new Entry(data.instance(0).stringValue(0), 0));
         
@@ -76,20 +76,35 @@ public class Apriori {
                 initialSet.remove(i);
             //If the 1-item set meets the min coverage, add to dataset
             else {
-                dataSet.add(new ItemSet());
-                dataSet.get(dataSet.size()-1).add(initialSet.get(i).getValue(), initialSet.get(i).getAttNum());
+                dataSet.add(new ItemSet(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));
             }     
         } 
+        
+        if(dataSet.isEmpty()) 
+            System.out.println("None of the item sets met the min coverage");
+        else 
+            recursiveSetBuild(dataSet.size());
+        
+        System.out.println("here");
+        for(int i = 0; i <dataSet.size(); i++) {
+            for(int j = 0; j < dataSet.get(i).size(); j++)
+                System.out.println(dataSet.get(i).get(j).value);
+        }
     }
     
     public void recursiveSetBuild(int startIndex) {
         int start = startIndex;
-        
-        for(int row = start; row < dataSet.size(); row++) {
+        System.out.println("here2");
+        if(dataSet.get(dataSet.size()-1).size() >= numAttributes)
+            return;
+            
+        for(int row = 0; row < dataSet.size(); row++) {
             for(int j = 0; j < initialSet.size(); j++) {
                 dataSet.add(new ItemSet(dataSet.get(row)));
                 dataSet.get(dataSet.size()-1).add(initialSet.get(j).getValue(), initialSet.get(j).getAttNum());
             }
         }
+        
+        recursiveSetBuild(dataSet.size());
     }
 }

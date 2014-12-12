@@ -28,6 +28,11 @@ public class ItemSet {
             instance.add(set.get(i));
         }
     }
+    
+    public ItemSet(String val, int attNum) {
+        instance = new ArrayList<>();
+        instance.add(new Entry(val, attNum));
+    }
 
     public Entry get(int i) {
         return instance.get(i);
