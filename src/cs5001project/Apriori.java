@@ -79,21 +79,17 @@ public class Apriori {
                 dataSet.add(0, new ItemSet(initialSet.get(i).getValue(), initialSet.get(i).getAttNum()));
             }     
         } 
-        
-        for(int i = 0; i < initialSet.size(); i++) {
-            System.out.println(initialSet.get(i).getValue());
-        }
-        
+        System.out.println(numInstances+"\n");
         if(dataSet.isEmpty()) 
             System.out.println("None of the item sets met the min coverage");
         else 
             recursiveSetBuild(0);
         
-        for(int i = 0; i <dataSet.size(); i++) {
+        /*for(int i = 0; i <dataSet.size(); i++) {
             System.out.println();
             for(int j = 0; j < dataSet.get(i).size(); j++)
                 System.out.print(dataSet.get(i).get(j).value+", ");
-        }
+        }*/
     }
     
     public void recursiveSetBuild(int startIndex) {
@@ -101,13 +97,13 @@ public class Apriori {
         int startSize = dataSet.size();
         
         if(dataSet.get(startSize-1).size() >= numAttributes) {
-            System.out.println("return");
             return;
         }
         
         for(int row = start; row < startSize; row++) {
             for(int j = 0; j < initialSet.size(); j++) {
                 if(!dataSet.get(row).containsAtt(initialSet.get(j).getAttNum())) {
+                    //Prevents having itemSets with the same values in different orders
                     if(initialSet.get(j).getAttNum() > dataSet.get(row).get(dataSet.get(row).size()-1).getAttNum()) {
                         dataSet.add(new ItemSet(dataSet.get(row)));
                         dataSet.get(dataSet.size()-1).add(initialSet.get(j).getValue(), initialSet.get(j).getAttNum());
@@ -115,6 +111,14 @@ public class Apriori {
                 }
             }
         }
+        
+        System.out.println(dataSet.size()-startSize);
+        /*for(int row = startSize; row < dataSet.size(); row++) {
+            for(int inst = 0; inst < numInstances; inst++) {
+                
+            }
+        }*/
+        
         
         recursiveSetBuild(startSize);
     }
