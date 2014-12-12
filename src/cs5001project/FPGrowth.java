@@ -28,7 +28,7 @@ public class FPGrowth {
     private ArffLoader.ArffReader arff;
     private Instances data;
     private ArrayList<Entry> frequentSet = new ArrayList<>();
-    private ArrayList<ArrayList<Entry>> dataSet = new ArrayList<>();
+    private ArrayList<ItemSet> dataSet = new ArrayList<>();
     
     public FPGrowth(String filePath, int minCoverage){
         file = filePath;
@@ -105,34 +105,47 @@ public class FPGrowth {
                 frequentSet.remove(i);  
         } 
         
-        //Organizes the entries from highest coverage to lowest
-        //MergeSort mergeSorter = new MergeSort();
-        //mergeSorter.sort(frequentSet);
-        
         bubbleSort();
-        
+        System.out.println("\nFrequent Set:");
         for(int i = 0; i < frequentSet.size(); i++) {
-            System.out.println(frequentSet.get(i).getValue());
+            int attNum = frequentSet.get(i).getAttNum();
+            System.out.println(data.attribute(attNum).name()+" = "+frequentSet.get(i).getValue()+" (Coverage = "+frequentSet.get(i).getCount()+")");
         }
+        System.out.println();
     }
     
     //Sorts the values of each instance in descending order based on frequency
     public void sortInstances() {
         for(int i = 0; i < numInstances; i++) {
             //Creates an ArrayList for each instance and stores it in the dataSet ArrayList
-            dataSet.add(new ArrayList<Entry>());
+            dataSet.add(new ItemSet());
             
             //Adds the values that meet the coverage minimum to the corresponding instance ArrayList in order of descending coverage
             for(int j = 0; j < frequentSet.size(); j++) {
                 for(int k = 0; k < numAttributes; k++) {
                     //if the value in the arff dataSet equals the value in the frequentSet and has same attribute number
                     if(data.instance(i).stringValue(k).equals(frequentSet.get(j).getValue()) && k == frequentSet.get(j).getAttNum()) {
-                        dataSet.get(dataSet.size()-1).add(new Entry(data.instance(i).stringValue(k), k));
+                        dataSet.get(dataSet.size()-1).add(data.instance(i).stringValue(k), k);
                     }
                 }
             }
         }
+        
+        System.out.println("Datasets:");
+        for(int j = 0; j < dataSet.size(); j++) {
+            for(int i = 0; i < dataSet.get(j).size(); i++) {
+            int attNum = dataSet.get(j).get(i).getAttNum();
+            if(i < dataSet.size()-1)
+                System.out.print(data.attribute(attNum).name()+" = "+dataSet.get(j).get(i).getValue()+", ");
+            else
+                System.out.print(data.attribute(attNum).name()+" = "+dataSet.get(j).get(i).getValue());
+            }
+            System.out.println();
+        }
+
     }
+    
+   
 	
     public void createFPTree() {
         //Max possible number of entries in an instance after sort instances

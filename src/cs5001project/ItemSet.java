@@ -95,7 +95,7 @@ public class ItemSet {
     }
     
     public void print(Instances data) {
-        
+        System.out.println("Datasets:");
         for(int i = 0; i < instance.size(); i++) {
             int attNum = instance.get(i).getAttNum();
             if(i < instance.size()-1)

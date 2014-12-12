@@ -12,13 +12,13 @@ import weka.core.Instances;
 public class Tree {
     private Node root;
     private int maxLevels;
-    ArrayList<ArrayList<Entry>> dataSet = new ArrayList<>();
+    ArrayList<ItemSet> dataSet = new ArrayList<>();
     
     public Tree() {
         root = new Node(new Entry("Root", -1));
     }
     
-    public void buildTree(ArrayList<ArrayList<Entry>> arrList, int max) {
+    public void buildTree(ArrayList<ItemSet> arrList, int max) {
         maxLevels = max;
         dataSet = arrList;
         for(int i = 0; i < dataSet.size(); i++) {

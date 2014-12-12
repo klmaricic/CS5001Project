@@ -92,13 +92,6 @@ public class CS5001Project {
         }
         maxSize = scanner.nextInt();
         
-        
-        
-        //FPGrowth fp = new FPGrowth(filePath, minCoverage);
-        //fp.createFrequentSet();
-        
-        
-        
         System.out.println("\nMinimum accuracy requirements: ");
         while(!scanner.hasNextDouble()){
             System.out.println("Invalid input. Must enter a double-type number. So for 60%, type 0.6.\n");
@@ -121,9 +114,15 @@ public class CS5001Project {
             numRules = Integer.parseInt(numRulesStr);
         }
         
-        Apriori apriori = new Apriori(filePath, minCoverage, maxSize, minAccuracy, numRules);
-        apriori.createSet();
-        apriori.createRules();
+        //Apriori apriori = new Apriori(filePath, minCoverage, maxSize, minAccuracy, numRules);
+        //apriori.createSet();
+        //apriori.createRules();
+        
+        FPGrowth fp = new FPGrowth(filePath, minCoverage);
+        fp.createFrequentSet();
+        fp.sortInstances();
+        
+        
         
         
         
