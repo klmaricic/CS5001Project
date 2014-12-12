@@ -81,17 +81,15 @@ public class Apriori {
             }     
         } 
     }
-    /*
-    public void recursiveSetBuild() {
-        for(int row = 0; row < dataSet.size(); row++) {
-            for(int col = 0; col < dataSet.get(row).size(); col++) {
-                for(int j = 0; j < initialSet.size(); j++) {
-                    if(dataSet.get(row).get(col).getAttNum() == initialSet.get(j).getAttNum()); {
-                        if(dataSet.get(row).get(col).getValue().equals(initialSet.get(j).getValue()))
-                            
-                    }
-                }
+    
+    public void recursiveSetBuild(int startIndex) {
+        int start = startIndex;
+        
+        for(int row = start; row < dataSet.size(); row++) {
+            for(int j = 0; j < initialSet.size(); j++) {
+                dataSet.add(new ItemSet(dataSet.get(row)));
+                dataSet.get(dataSet.size()-1).add(initialSet.get(j).getValue(), initialSet.get(j).getAttNum());
             }
         }
-    }*/
+    }
 }

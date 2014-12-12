@@ -19,6 +19,15 @@ public class ItemSet {
         count = 0;
         instance = new ArrayList<>();
     }
+    
+    //clones the old item set into the new one
+    public ItemSet(ItemSet set) {
+        instance = new ArrayList<>(set.size()+1);
+        
+        for(int i =0; i <set.size(); i++) {
+            instance.add(set.get(i));
+        }
+    }
 
     public Entry get(int i) {
         return instance.get(i);
@@ -30,6 +39,9 @@ public class ItemSet {
     
     public int getCount() {
         return count;
+    }
+    public void countInc() {
+        count++;
     }
     
     public int size() {
